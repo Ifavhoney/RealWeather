@@ -3,8 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:weather/data/data.dart' as data;
 import 'package:http/http.dart' as http;
-import 'package:weather/ui/nextScreen.dart';
-import 'package:weather/screens/days.dart';
+import 'package:weather/ui/changeCity.dart';
+import 'package:weather/screens/forecast.dart';
 
 class Weather extends StatefulWidget {
   @override
@@ -14,7 +14,11 @@ class Weather extends StatefulWidget {
 class _WeatherState extends State<Weather> {
   //TextStyles
   String city;
-
+  String _minTemp;
+  String _maxTemp;
+  String _currTemp;
+  String _main;
+  String _description;
   TextStyle cityStyle =
       TextStyle(color: Colors.pink, fontSize: 40, fontWeight: FontWeight.w700);
 
@@ -130,24 +134,22 @@ class _WeatherState extends State<Weather> {
         //check if there is data
         try {
           if (snapshot.hasData) {
+            _currTemp = snapshot.data["main"]["temp"].toString() + "˚C";
+            _minTemp = snapshot.data["main"]["temp_min"].toString() + "˚C";
+            _maxTemp = snapshot.data["main"]["temp_max"].toString() + "˚C";
+            _main = snapshot.data["weather"][0]["main"].toString();
+            _description =
+                snapshot.data["weather"][0]["description"].toString();
+            print(_description);
             return Container(
               // alignment: Alignment.bottomRight,
               child: ListTile(
                 //reading json
                 title: snapshot.data["main"]["temp"].toString() == null
                     ? Text("Invalid City")
-                    : Text(
-                        "Actual Temp: " +
-                            snapshot.data["main"]["temp"].toString() +
-                            "˚C",
-                        style: tempStyle),
+                    : Text("Actual Temp: " + _currTemp, style: tempStyle),
                 subtitle: Text(
-                  "Min Temp: " +
-                      snapshot.data["main"]["temp_min"].toString() +
-                      "˚C" +
-                      "\nMax Temp: " +
-                      snapshot.data["main"]["temp_max"].toString() +
-                      "˚C",
+                  "Min Temp: " + _minTemp + "\nMax Temp: " + _maxTemp,
                   style: trailingTempStyle,
                 ),
               ),
@@ -172,25 +174,23 @@ class _WeatherState extends State<Weather> {
   void toDays(BuildContext context) async {
     MaterialPageRoute route =
         MaterialPageRoute(builder: (BuildContext context) {
-      return Days();
-    });
-    var results = await Navigator.of(context).push(route);
+      print(this.city);
 
-    try {
-      if (results["value"] == null) {
-        this.city = data.defaultCity;
-      } else {
-        //send this to next page
-        this.city = results["value"];
-      }
-    } catch (exception) {
-      print(exception);
-    }
+      return Forecast(
+        city: this.city == null ? data.defaultCity : this.city,
+        minTemp: _minTemp,
+        maxTemp: _maxTemp,
+        currTemp: _currTemp,
+        main: _main,
+        description: _description,
+      );
+    });
+    await Navigator.of(context).push(route);
   }
 
   void changeScreens(BuildContext contexts) async {
     var route = MaterialPageRoute(builder: (BuildContext context) {
-      return NextScreen();
+      return ChangeCity();
     });
 
     //expecting a result - Navigator.of to push

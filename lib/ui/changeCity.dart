@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class NextScreen extends StatelessWidget {
+class ChangeCity extends StatelessWidget {
   String _city;
   final TextEditingController _controller = TextEditingController();
   @override
@@ -39,7 +40,7 @@ class NextScreen extends StatelessWidget {
                   //_Sending
                   _controller.text = "Toronto";
                 }
-
+                addStringToSF(_controller.text);
                 Navigator.of(context).pop({"value": _controller.text});
                 //  print(_controller.text);
               },
@@ -48,5 +49,10 @@ class NextScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  addStringToSF(String val) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('stringValue', val);
   }
 }
