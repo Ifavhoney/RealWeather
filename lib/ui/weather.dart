@@ -9,16 +9,22 @@ import 'package:weather/screens/forecast.dart';
 class Weather extends StatefulWidget {
   @override
   _WeatherState createState() => _WeatherState();
+  final String prevCity;
+  Weather(this.prevCity);
 }
 
 class _WeatherState extends State<Weather> {
-  //TextStyles
+//Prev city
+
   String city;
   String _minTemp;
   String _maxTemp;
   String _currTemp;
   String _main;
   String _description;
+
+  //TextStyles
+
   TextStyle cityStyle =
       TextStyle(color: Colors.pink, fontSize: 40, fontWeight: FontWeight.w700);
 
@@ -34,9 +40,12 @@ class _WeatherState extends State<Weather> {
       TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.bold);
   @override
   Widget build(BuildContext context) {
-    testApi();
+    this.city = widget.prevCity;
+    //getValuesSF();
+    //print(this.city);
     return Scaffold(
       appBar: AppBar(
+        leading: Container(),
         title: Text("Weather App"),
         backgroundColor: Colors.brown,
         actions: <Widget>[
@@ -71,7 +80,7 @@ class _WeatherState extends State<Weather> {
           Container(
               child: Row(
             children: <Widget>[
-              city == null
+              this.city == null
                   ? Text(
                       //Text = defaultCity, textStyle = citySyle
                       data.defaultCity,
@@ -88,10 +97,10 @@ class _WeatherState extends State<Weather> {
           Padding(
             padding: const EdgeInsets.fromLTRB(180, 0, 0, 0),
             child: Container(
-              alignment: Alignment.bottomRight,
-              child:
-                  city == null ? apiWidget(data.defaultCity) : apiWidget(city),
-            ),
+                alignment: Alignment.bottomRight,
+                child: this.city == null
+                    ? apiWidget(data.defaultCity)
+                    : apiWidget(this.city)),
           )
         ],
       ),
@@ -101,34 +110,27 @@ class _WeatherState extends State<Weather> {
   //Future is used to for data that may or may not come
   //Type Map because JSON<String, dynamic>
   //Has to be async
-  Future<Map<String, dynamic>> callAPI(String apiKey, String city) async {
-    //https://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=YOUR_API_KEY
-
-    String endpoint =
-        "https://api.openweathermap.org/data/2.5/weather?q=$city&units=metric&appid=$apiKey";
-
-    //comes http package - http.response gets the entire package so we are able to call get
-    http.Response response = await http.get(endpoint);
-    return jsonDecode(response.body);
-  }
 
   void testApi() async {
-    Map<String, dynamic> test = await callAPI(data.appKey, data.defaultCity);
+    Map<String, dynamic> test =
+        await API.callWeatherAPI(data.appKey, data.defaultCity);
     //(test);
   }
 
-  void getcity() async {
+/*
+  void getValuesSF() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('city', this.city);
-    String city = (prefs.getString('city') ?? data.defaultCity);
-    print(city);
+    //Return String
+    String stringValue = prefs.getString('stringValue');
+    this.city = stringValue;
   }
+  */
 
   Widget apiWidget(String _city) {
     //Have to return soemthing
     return FutureBuilder(
       //future builder requires a Future<Map>
-      future: callAPI(data.appKey, _city),
+      future: API.callWeatherAPI(data.appKey, _city),
       builder:
           (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         //check if there is data
@@ -140,7 +142,7 @@ class _WeatherState extends State<Weather> {
             _main = snapshot.data["weather"][0]["main"].toString();
             _description =
                 snapshot.data["weather"][0]["description"].toString();
-            print(_description);
+            // print(_description);
             return Container(
               // alignment: Alignment.bottomRight,
               child: ListTile(
@@ -172,12 +174,12 @@ class _WeatherState extends State<Weather> {
   }
 
   void toDays(BuildContext context) async {
+    this.city = this.city == null ? data.defaultCity : this.city;
+
     MaterialPageRoute route =
         MaterialPageRoute(builder: (BuildContext context) {
-      print(this.city);
-
       return Forecast(
-        city: this.city == null ? data.defaultCity : this.city,
+        city: this.city,
         minTemp: _minTemp,
         maxTemp: _maxTemp,
         currTemp: _currTemp,
@@ -185,6 +187,7 @@ class _WeatherState extends State<Weather> {
         description: _description,
       );
     });
+
     await Navigator.of(context).push(route);
   }
 
@@ -212,3 +215,17 @@ class _WeatherState extends State<Weather> {
 
 //we are changing state
 //stateless = onpressed, text etc
+
+class API {
+  static Future<Map<String, dynamic>> callWeatherAPI(
+      String apiKey, String city) async {
+    //https://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=YOUR_API_KEY
+
+    String endpoint =
+        "https://api.openweathermap.org/data/2.5/weather?q=$city&units=metric&appid=$apiKey";
+
+    //comes http package - http.response gets the entire package so we are able to call get
+    http.Response response = await http.get(endpoint);
+    return jsonDecode(response.body);
+  }
+}

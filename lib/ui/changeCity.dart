@@ -11,6 +11,7 @@ class ChangeCity extends StatelessWidget {
         backgroundColor: Colors.amberAccent,
         title: Text("City"),
       ),
+      // bottomNavigationBar: ,
       body: Stack(
         children: <Widget>[
           Positioned(
@@ -41,7 +42,9 @@ class ChangeCity extends StatelessWidget {
                   _controller.text = "Toronto";
                 }
                 addStringToSF(_controller.text);
+
                 Navigator.of(context).pop({"value": _controller.text});
+
                 //  print(_controller.text);
               },
             ),
@@ -54,5 +57,6 @@ class ChangeCity extends StatelessWidget {
   addStringToSF(String val) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('stringValue', val);
+    //  print(val);
   }
 }

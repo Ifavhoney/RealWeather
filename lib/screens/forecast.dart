@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/data/data.dart' as data;
+import 'package:weather/ui/weather.dart';
 import 'package:expandable/expandable.dart';
 import 'package:intl/intl.dart';
 
@@ -13,7 +14,6 @@ class Forecast extends StatefulWidget {
   final String currTemp;
   final String main;
   final String description;
-
   Forecast(
       {Key key,
       this.city,
@@ -43,13 +43,30 @@ class _DaysState extends State<Forecast> {
   TextStyle styleDays =
       TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.bold);
 
-  String _city;
   Image _image = null;
+  String _sharedCity;
+  int _currentIndex = 1;
 
+//Does something upon scrolling down
+  ScrollController controller;
+
+/*
+@override
+void initState() { 
+  super.initState();
+  controller = ScrollController().addListener(listener);
+  
+}
+@override
+void dispose() { 
+  //called when an object is disposed from the tree
+  controller = ScrollController().removeListener(listener)
+  super.dispose();
+}
+*/
   Widget build(BuildContext context) {
-    int _currentIndex = 0;
+    getValuesSF();
     return Scaffold(
-        /*
         bottomNavigationBar: BottomNavigationBar(
             currentIndex: _currentIndex,
             backgroundColor: Colors.blue,
@@ -61,19 +78,15 @@ class _DaysState extends State<Forecast> {
             selectedIconTheme: IconThemeData(size: 40),
             items: [
               BottomNavigationBarItem(
-                activeIcon: Icon(
-                  Icons.home,
-                ),
                 icon: Icon(
                   Icons.home,
-                  color: Colors.grey,
                 ),
                 title: Text(
                   "Home",
-                  style: TextStyle(color: Colors.white),
                 ),
               ),
               BottomNavigationBarItem(
+                  activeIcon: Icon(Icons.cloud),
                   icon: Icon(Icons.cloud),
                   title: Text(
                     "Forecast",
@@ -94,45 +107,63 @@ class _DaysState extends State<Forecast> {
                       Icons.keyboard_arrow_right,
                       size: 40,
                     ),
-                    Text("Toronto")
+                    Text(_sharedCity == null ? widget.city : _sharedCity)
                   ],
                 ),
               ),
             ],
             onTap: (int index) {
               setState(() {
-                _currentIndex = index;
-                redirect(_currentIndex);
-                print(_currentIndex);
+                this._currentIndex = index;
+                if (_currentIndex < 3) {
+                  redirect(_currentIndex);
+                }
+                // print(_currentIndex);
               });
             }),
-            */
         body: Stack(
-      children: <Widget>[
-        Positioned(
-          child: Image.asset(
-            "images/wallpaper.jpg",
-            fit: BoxFit.fill,
-            height: 2000,
-            width: 3000,
-          ),
-        ),
-        Container(height: 5000, width: 2000, child: apiWidget("toronto"))
-      ],
-    ));
+          children: <Widget>[
+            Positioned(
+              child: Image.asset(
+                "images/wallpaper.jpg",
+                fit: BoxFit.fill,
+                height: 2000,
+                width: 3000,
+              ),
+            ),
+            Container(
+                height: 5000,
+                width: 2000,
+                child:
+                    bodyWidget(_sharedCity == null ? widget.city : _sharedCity))
+          ],
+        ));
   }
 
-  Future redirect(int index) {
+  Future redirect(int index) async {
     switch (index) {
       case 0:
-        return Navigator.pushNamed(context, "/");
+        MaterialPageRoute route =
+            MaterialPageRoute(builder: (BuildContext context) {
+          return Weather(this._sharedCity);
+        });
+        return await Navigator.of(context).push(route);
         break;
 
       case 1:
-        return Navigator.pushNamed(context, "/forecast");
+        MaterialPageRoute route =
+            MaterialPageRoute(builder: (BuildContext context) {
+          return Forecast(
+            city: _sharedCity == null ? widget.city : _sharedCity,
+          );
+        });
+        return await Navigator.of(context).push(route);
+
         break;
 
       case 2:
+        _currentIndex--;
+        print(_currentIndex);
         return Navigator.pushNamed(context, "/changeCity");
         break;
 
@@ -145,6 +176,8 @@ class _DaysState extends State<Forecast> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Return String
     String stringValue = prefs.getString('stringValue');
+
+    _sharedCity = stringValue;
   }
 
   Image showDesc(String description) {
@@ -378,7 +411,75 @@ class _DaysState extends State<Forecast> {
     }
   }
 
-  Widget apiWidget(String _city) {
+  Widget headerWidget(String _city) {
+    return FutureBuilder(
+      future: API.callWeatherAPI(data.appKey, _city),
+      builder:
+          (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        if (snapshot.hasData) {
+          String _temp = snapshot.data["main"]["temp"].toString() + "˚C";
+          String _minTemp = snapshot.data["main"]["temp_min"].toString() + "˚C";
+          //   print(_minTemp);
+
+          String _maxTemp = snapshot.data["main"]["temp_max"].toString() + "˚C";
+          String _main = snapshot.data["weather"][0]["main"].toString();
+          String _description =
+              snapshot.data["weather"][0]["description"].toString();
+          return SliverAppBar(
+            //how far AppBar expands
+            expandedHeight: 70,
+            floating: true,
+            //pins appbar to top,
+            //    pinned: true,
+            // title: Text("Sliver AppBar"),
+            ///flexbible space bar
+            leading: showMain(widget.main, 10),
+
+            title: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  _temp,
+                  style: styleTime,
+                ),
+                Text(
+                  _description,
+                  style: TextStyle(fontSize: 10),
+                )
+              ],
+            ),
+            actions: [
+              Row(
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      tempCard(
+                        type: "max",
+                        temp: _maxTemp,
+                      ),
+                      tempCard(
+                        type: "min",
+                        temp: _minTemp,
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ],
+          );
+        } else {
+          return SliverAppBar(
+            expandedHeight: 70,
+            floating: true,
+            title: Text(" "),
+          );
+        }
+      },
+    );
+  }
+
+  Widget bodyWidget(String _city) {
     return FutureBuilder(
         future: callAPI(data.appKey, _city),
         builder: (BuildContext context,
@@ -386,56 +487,11 @@ class _DaysState extends State<Forecast> {
           if (snapshot.hasData) {
             return CustomScrollView(
               slivers: <Widget>[
-                // hei
-
-                SliverAppBar(
-                  //how far AppBar expands
-                  expandedHeight: 70,
-                  floating: true,
-                  //pins appbar to top,
-                  //    pinned: true,
-                  // title: Text("Sliver AppBar"),
-                  ///flexbible space bar
-                  leading: showMain(widget.main, 10),
-
-                  title: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        widget.currTemp,
-                        style: styleTime,
-                      ),
-                      Text(
-                        widget.description,
-                        style: TextStyle(fontSize: 10),
-                      )
-                    ],
-                  ),
-                  actions: [
-                    Row(
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            tempCard(
-                              type: "max",
-                              temp: widget.maxTemp,
-                            ),
-                            tempCard(
-                              type: "min",
-                              temp: widget.minTemp,
-                            )
-                          ],
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-
+                headerWidget(_city),
                 //List begins
                 SliverList(
                   delegate: SliverChildBuilderDelegate((context, i) {
-                    if (i < 40) {
+                    if (i < 10) {
                       DateFormat f = new DateFormat('jm');
                       var _currTime = f.format(DateTime.parse(
                           snapshot.data["list"][i]["dt_txt"].toString()));
