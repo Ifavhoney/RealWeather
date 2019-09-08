@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/data/data.dart' as data;
-import 'package:weather/ui/weather.dart';
+import 'package:weather/screens/weather.dart';
 import 'package:expandable/expandable.dart';
 import 'package:intl/intl.dart';
 
@@ -145,7 +145,7 @@ void dispose() {
       case 0:
         MaterialPageRoute route =
             MaterialPageRoute(builder: (BuildContext context) {
-          return Weather(this._sharedCity);
+          return Weather(prevCity: this._sharedCity);
         });
         return await Navigator.of(context).push(route);
         break;
@@ -481,7 +481,7 @@ void dispose() {
 
   Widget bodyWidget(String _city) {
     return FutureBuilder(
-        future: callAPI(data.appKey, _city),
+        future: callAPI(data.bodyKey, _city),
         builder: (BuildContext context,
             AsyncSnapshot<Map<String, dynamic>> snapshot) {
           if (snapshot.hasData) {

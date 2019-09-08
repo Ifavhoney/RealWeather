@@ -3,20 +3,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:weather/data/data.dart' as data;
 import 'package:http/http.dart' as http;
-import 'package:weather/ui/changeCity.dart';
+import 'package:weather/screens/changeCity.dart';
 import 'package:weather/screens/forecast.dart';
 
 class Weather extends StatefulWidget {
   @override
   _WeatherState createState() => _WeatherState();
   final String prevCity;
-  Weather(this.prevCity);
+
+  Weather({this.prevCity});
 }
 
 class _WeatherState extends State<Weather> {
 //Prev city
 
   String city;
+  String _tempCity;
   String _minTemp;
   String _maxTemp;
   String _currTemp;
@@ -40,9 +42,16 @@ class _WeatherState extends State<Weather> {
       TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.bold);
   @override
   Widget build(BuildContext context) {
-    this.city = widget.prevCity;
+    if (widget.prevCity == null && _tempCity == null) {
+      this.city = data.defaultCity;
+    } else if (_tempCity != null && widget.prevCity == null) {
+      print("check");
+      this.city = _tempCity;
+    } else {
+      this.city = widget.prevCity;
+    }
     //getValuesSF();
-    //print(this.city);
+    print(this.city);
     return Scaffold(
       appBar: AppBar(
         leading: Container(),
@@ -202,10 +211,10 @@ class _WeatherState extends State<Weather> {
     try {
       //we are requesting "VALUE"
       if (results["value"] == null) {
-        this.city = data.defaultCity;
+        this._tempCity = data.defaultCity;
       } else {
         //setting city to whatever value
-        this.city = results["value"];
+        this._tempCity = results["value"];
       }
     } catch (exception) {
       print(exception);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weather/screens/weather.dart';
 
 class ChangeCity extends StatelessWidget {
   String _city;
@@ -44,7 +45,6 @@ class ChangeCity extends StatelessWidget {
                 addStringToSF(_controller.text);
 
                 Navigator.of(context).pop({"value": _controller.text});
-
                 //  print(_controller.text);
               },
             ),
