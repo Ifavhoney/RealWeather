@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weather/widgets/header/header.dart';
 import 'dart:convert';
 import 'package:weather/data/data.dart' as data;
 import 'package:http/http.dart' as http;
@@ -45,26 +46,23 @@ class _WeatherState extends State<Weather> {
     if (widget.prevCity == null && _tempCity == null) {
       this.city = data.defaultCity;
     } else if (_tempCity != null && widget.prevCity == null) {
-      print("check");
       this.city = _tempCity;
     } else {
       this.city = widget.prevCity;
     }
     //getValuesSF();
     print(this.city);
+
     return Scaffold(
-      appBar: AppBar(
-        leading: Container(),
-        title: Text("Weather App"),
-        backgroundColor: Colors.brown,
-        actions: <Widget>[
+      appBar: BaseAppBar(
+        // leading: Container(),
+        appBar: AppBar(),
+        title: Text("Welcome!"),
+        backgroundColor: Colors.lightBlue,
+        widgets: <Widget>[
           IconButton(
-            icon: Icon(Icons.navigate_next),
-            onPressed: () {
-              //calls changeScreens
-              changeScreens(this.context);
-            },
-          )
+              icon: Icon(Icons.navigate_next),
+              onPressed: () => changeScreens(this.context))
         ],
       ),
       body: Stack(
@@ -77,15 +75,6 @@ class _WeatherState extends State<Weather> {
               width: 2000,
             ),
           ),
-          /*
-          Positioned(
-            child: Image.asset("images/light_rain.png"),
-            top: 200,
-            left: 40,
-          ),
-          */
-          //padding: EdgeInsets.fromLTRB(100, 40, 0, 500),
-
           Container(
               child: Row(
             children: <Widget>[
@@ -120,12 +109,6 @@ class _WeatherState extends State<Weather> {
   //Type Map because JSON<String, dynamic>
   //Has to be async
 
-  void testApi() async {
-    Map<String, dynamic> test =
-        await API.callWeatherAPI(data.appKey, data.defaultCity);
-    //(test);
-  }
-
 /*
   void getValuesSF() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -139,7 +122,7 @@ class _WeatherState extends State<Weather> {
     //Have to return soemthing
     return FutureBuilder(
       //future builder requires a Future<Map>
-      future: API.callWeatherAPI(data.appKey, _city),
+      future: data.API.callWeatherAPI(data.appKey, _city),
       builder:
           (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         //check if there is data

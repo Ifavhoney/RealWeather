@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
 
-class Header extends StatelessWidget {
-  final String _title;
-  Header(this._title);
-
+class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final Text title;
+  final Color backgroundColor;
+  final Widget leading;
+  final List<Widget> widgets;
+  final AppBar appBar;
+  const BaseAppBar(
+      {Key key,
+      this.title,
+      this.backgroundColor,
+      this.appBar,
+      this.widgets,
+      this.leading})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return appBar(_title, ctx: context);
+    return AppBar(
+      title: title,
+      backgroundColor: backgroundColor,
+      actions: widgets,
+      leading: leading,
+    );
   }
-}
 
-AppBar appBar(String title, {BuildContext ctx}) {
-  AppBar(
-    leading: Container(),
-    title: Text(title),
-    backgroundColor: Colors.brown,
-    actions: <Widget>[
-      IconButton(
-        icon: Icon(Icons.navigate_next),
-        onPressed: () {
-          //calls changeScreens
-          //changeScreens(ctx);
-        },
-      )
-    ],
-  );
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => Size.fromHeight(appBar.preferredSize.height);
 }
