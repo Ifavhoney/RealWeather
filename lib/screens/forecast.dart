@@ -69,7 +69,7 @@ void dispose() {
     return Scaffold(
         bottomNavigationBar: BottomNavigationBar(
             currentIndex: _currentIndex,
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.lightBlue,
             type: BottomNavigationBarType.fixed,
             selectedItemColor: Colors.white,
             selectedLabelStyle:
@@ -413,7 +413,7 @@ void dispose() {
 
   Widget headerWidget(String _city) {
     return FutureBuilder(
-      future: API.callWeatherAPI(data.appKey, _city),
+      future: data.WeatherAPIs.callTodayWeather(data.appKey, _city),
       builder:
           (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         if (snapshot.hasData) {
@@ -429,6 +429,7 @@ void dispose() {
             //how far AppBar expands
             expandedHeight: 70,
             floating: true,
+            backgroundColor: Colors.lightBlue,
             //pins appbar to top,
             //    pinned: true,
             // title: Text("Sliver AppBar"),

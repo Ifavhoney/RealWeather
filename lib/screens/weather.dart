@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:weather/widgets/header/header.dart';
+import 'package:weather/widgets/header/header.dart' as header;
+import 'package:weather/widgets/weather/apiWidget.dart' as body;
 import 'dart:convert';
+
 import 'package:weather/data/data.dart' as data;
 import 'package:http/http.dart' as http;
 import 'package:weather/screens/changeCity.dart';
@@ -54,8 +55,8 @@ class _WeatherState extends State<Weather> {
     print(this.city);
 
     return Scaffold(
-      appBar: BaseAppBar(
-        // leading: Container(),
+      appBar: header.BaseAppBar(
+        leading: Container(),
         appBar: AppBar(),
         title: Text("Welcome!"),
         backgroundColor: Colors.lightBlue,
@@ -69,7 +70,8 @@ class _WeatherState extends State<Weather> {
         children: <Widget>[
           Positioned(
             child: Image.asset(
-              "images/EmilyJason.JPG",
+              //"images/EmilyJason.JPG"
+              "images/mainWallpaper.jpg",
               fit: BoxFit.fill,
               height: 3000,
               width: 2000,
@@ -105,10 +107,6 @@ class _WeatherState extends State<Weather> {
     );
   }
 
-  //Future is used to for data that may or may not come
-  //Type Map because JSON<String, dynamic>
-  //Has to be async
-
 /*
   void getValuesSF() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -122,7 +120,7 @@ class _WeatherState extends State<Weather> {
     //Have to return soemthing
     return FutureBuilder(
       //future builder requires a Future<Map>
-      future: data.API.callWeatherAPI(data.appKey, _city),
+      future: data.WeatherAPIs.callTodayWeather(data.appKey, _city),
       builder:
           (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         //check if there is data
@@ -134,32 +132,27 @@ class _WeatherState extends State<Weather> {
             _main = snapshot.data["weather"][0]["main"].toString();
             _description =
                 snapshot.data["weather"][0]["description"].toString();
-            // print(_description);
-            return Container(
-              // alignment: Alignment.bottomRight,
-              child: ListTile(
-                //reading json
-                title: snapshot.data["main"]["temp"].toString() == null
-                    ? Text("Invalid City")
-                    : Text("Actual Temp: " + _currTemp, style: tempStyle),
-                subtitle: Text(
-                  "Min Temp: " + _minTemp + "\nMax Temp: " + _maxTemp,
-                  style: trailingTempStyle,
-                ),
-              ),
+
+            return body.ApiWidget(
+              hasData: true,
+              city: _city,
+              currTemp: _currTemp,
+              minTemp: _minTemp,
+              maxTemp: _maxTemp,
+              main: _main,
+              description: _description,
             );
           } else {
             return Container();
           }
         } catch (exception) {
+          //Another Widget
           print(exception);
 
-          return Container(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Invalid City",
-                style: errorStyle,
-              ));
+          return body.ApiWidget(
+            city: _city,
+            hasData: false,
+          );
         }
       },
     );
@@ -202,22 +195,5 @@ class _WeatherState extends State<Weather> {
     } catch (exception) {
       print(exception);
     }
-  }
-}
-
-//we are changing state
-//stateless = onpressed, text etc
-
-class API {
-  static Future<Map<String, dynamic>> callWeatherAPI(
-      String apiKey, String city) async {
-    //https://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=YOUR_API_KEY
-
-    String endpoint =
-        "https://api.openweathermap.org/data/2.5/weather?q=$city&units=metric&appid=$apiKey";
-
-    //comes http package - http.response gets the entire package so we are able to call get
-    http.Response response = await http.get(endpoint);
-    return jsonDecode(response.body);
   }
 }

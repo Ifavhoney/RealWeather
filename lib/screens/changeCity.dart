@@ -3,13 +3,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather/screens/weather.dart';
 
 class ChangeCity extends StatelessWidget {
-  String _city;
   final TextEditingController _controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.amberAccent,
+        backgroundColor: Colors.lightBlue,
         title: Text("City"),
       ),
       // bottomNavigationBar: ,

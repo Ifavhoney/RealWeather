@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+//Reusable AppBar
 class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Text title;
   final Color backgroundColor;

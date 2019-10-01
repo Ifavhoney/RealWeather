@@ -12,6 +12,7 @@ void main() async {
     title: "Weather",
     debugShowCheckedModeBanner: false,
     home: Home(),
+    //No Need for theme data
     initialRoute: '/',
     routes: {
       '/weather': (context) => Weather(),
