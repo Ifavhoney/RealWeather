@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:weather/screens/changeCity.dart';
 import 'package:weather/screens/weather.dart';
 import 'package:weather/screens/forecast.dart';
 import 'package:weather/screens/home.dart';
+
 import 'package:weather/data/data.dart' as data;
 
 //TO DO - TURN APP INTO A STATE MANAGEMENT APP
 
-void main() async {
-  runApp(MaterialApp(
-    title: "Weather",
-    debugShowCheckedModeBanner: false,
-    home: Home(),
-    //No Need for theme data
-    initialRoute: '/',
-    routes: {
-      '/weather': (context) => Weather(),
-      '/forecast': (context) => Forecast(),
-      '/changeCity': (context) => ChangeCity(),
-    },
-  ));
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [],
+      child: MaterialApp(
+        title: "Weather",
+        debugShowCheckedModeBanner: false,
+        home: Home(),
+        //No Need for theme data
+        initialRoute: '/',
+        routes: {
+          '/weather': (context) => Weather(),
+          '/forecast': (context) => Forecast(),
+          '/changeCity': (context) => ChangeCity(),
+        },
+      ),
+    );
+  }
 }

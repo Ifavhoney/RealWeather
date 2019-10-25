@@ -21,6 +21,8 @@ class WeatherAPIs {
     return jsonDecode(response.body);
   }
 
+  //callForecastWeather
+
   void testApi() async {
     Map<String, dynamic> test =
         await WeatherAPIs.callTodayWeather(appKey, defaultCity);

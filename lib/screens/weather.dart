@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:weather/widgets/header/header.dart' as header;
 import 'package:weather/widgets/weather/apiWidget.dart' as body;
-import 'dart:convert';
 
 import 'package:weather/data/data.dart' as data;
-import 'package:http/http.dart' as http;
+import 'package:weather/theme/appTheme.dart';
 import 'package:weather/screens/changeCity.dart';
 import 'package:weather/screens/forecast.dart';
 
@@ -27,21 +26,8 @@ class _WeatherState extends State<Weather> {
   String _main;
   String _description;
 
-  //TextStyles
+  //TextStyle
 
-  TextStyle cityStyle =
-      TextStyle(color: Colors.pink, fontSize: 40, fontWeight: FontWeight.w700);
-
-  TextStyle tempStyle = TextStyle(
-      color: Colors.redAccent.shade700,
-      fontSize: 15,
-      fontWeight: FontWeight.bold);
-
-  TextStyle trailingTempStyle = TextStyle(
-      color: Colors.pink.shade200, fontSize: 10, fontWeight: FontWeight.bold);
-
-  TextStyle errorStyle =
-      TextStyle(color: Colors.black, fontSize: 40, fontWeight: FontWeight.bold);
   @override
   Widget build(BuildContext context) {
     if (widget.prevCity == null && _tempCity == null) {
@@ -84,11 +70,11 @@ class _WeatherState extends State<Weather> {
                   ? Text(
                       //Text = defaultCity, textStyle = citySyle
                       data.defaultCity,
-                      style: cityStyle,
+                      style: GlobalTextStyle.cityStyle,
                     )
                   : Text(
                       city,
-                      style: cityStyle,
+                      style: GlobalTextStyle.cityStyle,
                     ),
               IconButton(
                   icon: Icon(Icons.info), onPressed: () => toDays(context))
@@ -133,6 +119,7 @@ class _WeatherState extends State<Weather> {
             _description =
                 snapshot.data["weather"][0]["description"].toString();
 
+            //Widget Builder
             return body.ApiWidget(
               hasData: true,
               city: _city,

@@ -6,6 +6,8 @@ import 'package:weather/data/data.dart' as data;
 import 'package:weather/screens/weather.dart';
 import 'package:expandable/expandable.dart';
 import 'package:intl/intl.dart';
+import 'package:weather/widgets/footer/footer.dart';
+import 'package:weather/widgets/forecast/allIcons.dart';
 
 class Forecast extends StatefulWidget {
   final String city;
@@ -67,60 +69,9 @@ void dispose() {
   Widget build(BuildContext context) {
     getValuesSF();
     return Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
+        bottomNavigationBar: Footer(
             currentIndex: _currentIndex,
-            backgroundColor: Colors.lightBlue,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: Colors.white,
-            selectedLabelStyle:
-                TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            // selectedFontSize: 14,
-            selectedIconTheme: IconThemeData(size: 40),
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.home,
-                ),
-                title: Text(
-                  "Home",
-                ),
-              ),
-              BottomNavigationBarItem(
-                  activeIcon: Icon(Icons.cloud),
-                  icon: Icon(Icons.cloud),
-                  title: Text(
-                    "Forecast",
-                    //      style: TextStyle(color: Colors.white),
-                  )),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.refresh),
-                title: Text(
-                  "Change City",
-                  //  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              BottomNavigationBarItem(
-                title: Text(""),
-                icon: Row(
-                  children: <Widget>[
-                    Icon(
-                      Icons.keyboard_arrow_right,
-                      size: 40,
-                    ),
-                    Text(_sharedCity == null ? widget.city : _sharedCity)
-                  ],
-                ),
-              ),
-            ],
-            onTap: (int index) {
-              setState(() {
-                this._currentIndex = index;
-                if (_currentIndex < 3) {
-                  redirect(_currentIndex);
-                }
-                // print(_currentIndex);
-              });
-            }),
+            city: _sharedCity == null ? widget.city : _sharedCity),
         body: Stack(
           children: <Widget>[
             Positioned(
@@ -140,38 +91,6 @@ void dispose() {
         ));
   }
 
-  Future redirect(int index) async {
-    switch (index) {
-      case 0:
-        MaterialPageRoute route =
-            MaterialPageRoute(builder: (BuildContext context) {
-          return Weather(prevCity: this._sharedCity);
-        });
-        return await Navigator.of(context).push(route);
-        break;
-
-      case 1:
-        MaterialPageRoute route =
-            MaterialPageRoute(builder: (BuildContext context) {
-          return Forecast(
-            city: _sharedCity == null ? widget.city : _sharedCity,
-          );
-        });
-        return await Navigator.of(context).push(route);
-
-        break;
-
-      case 2:
-        _currentIndex--;
-        print(_currentIndex);
-        return Navigator.pushNamed(context, "/changeCity");
-        break;
-
-      default:
-        return null;
-    }
-  }
-
   getValuesSF() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Return String
@@ -180,236 +99,7 @@ void dispose() {
     _sharedCity = stringValue;
   }
 
-  Image showDesc(String description) {
-    const double size = 10;
-    switch (description) {
-      //clouds cover all 8/8 areas
-      case "overcast clouds":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.grey.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.black);
-        return Image.asset(
-          "images/overcastClouds.JPG",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-      // Clouds cover 1/8 to 2/8 coverage
-      case "few clouds":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.grey.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.black);
-        return Image.asset(
-          "images/fewClouds.png",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-
-      // Clouds cover 3/8 to 7/8 coverage,
-      case "broken clouds":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.grey.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.black);
-        return Image.asset(
-          "images/brokenClouds.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-
-      //Clouds cover 3/8 to 4/8 coverage
-      case "scattered clouds":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.grey.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.black);
-        return Image.asset(
-          "images/scatteredClouds.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-      //0.10 inches of rain per hour.
-      case "light rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-
-        return Image.asset(
-          "images/lightRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-      //  0.10 to 0.30 inches of rain per hour
-      case "moderate rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-        return Image.asset(
-          "images/moderateRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-      //Heavy rainfall is more than 0.30 inches of rain per hour
-      case "heavy intensive rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-        return Image.asset(
-          "images/heavyRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-      //Very Heavy rainfall is more than 0.30 inches of rain per hour
-      case "very heavy rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-        return Image.asset(
-          "images/heavyRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-      //Heavy rainfall is more than 4 inches of rain per hour
-      case "extreme rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-        return Image.asset(
-          "images/extremeRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-//Rain that freezes on impact with the ground or solid objects
-      case "freezing rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-        return Image.asset(
-          "images/freezingRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-//Light Rain with a shorter duration than usual on a small span of area (differs by city)
-      case "light intensive shower rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-        return Image.asset(
-          "images/moderateRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-//Rain with shorter duration than usual on a small span of area (differs by city)
-      case "shower rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-        return Image.asset(
-          "images/moderateRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-//Heavy Rain with shorter duration than usual on a small span of area (differs by city)
-
-      case "heavy intensive shower rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-        return Image.asset(
-          "images/heavyIntensiveShowerRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-//Irregular rain
-
-      case "ragged shower rain":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.blue.shade200);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.white);
-        return Image.asset(
-          "images/moderateRain.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-      // Clouds cover 0/8 to 0.5/8
-      case "clear sky":
-        styleCurrTemp = styleCurrTemp.copyWith(color: Colors.white);
-        styleCurrHumidity = styleCurrHumidity.copyWith(color: Colors.black);
-        return Image.asset(
-          "images/clearSky.jpg",
-          fit: BoxFit.fill,
-          height: 300,
-          width: MediaQuery.of(context).size.width,
-        );
-        break;
-
-      default:
-        return this._image = Image.asset(
-          "images/white_snow.png",
-          height: size,
-          width: size,
-        );
-    }
-  }
-
-  Image showMain(String main, double size) {
-    switch (main) {
-      case "Clouds":
-        styleTemp = styleTemp.copyWith(color: Colors.white);
-
-        return this._image = Image.asset(
-          "images/Clouds.png",
-          height: size,
-          width: size,
-        );
-        break;
-      case "Rain":
-        styleTemp = styleTemp.copyWith(color: Colors.white);
-
-        return this._image = Image.asset(
-          "images/Rain.png",
-          height: size,
-          width: size,
-        );
-        break;
-      case "Clear":
-        styleTemp = styleTemp.copyWith(color: Colors.white);
-
-        return this._image = Image.asset(
-          "images/Clear.png",
-          height: size,
-          width: size,
-        );
-        break;
-
-      case "Snow":
-        styleTemp = styleTemp.copyWith(color: Colors.white);
-
-        return this._image = Image.asset(
-          "images/white_snow.png",
-          height: size,
-          width: size,
-        );
-
-      default:
-        return this._image = Image.asset(
-          "images/Clouds.png",
-          height: size,
-          width: size,
-        );
-    }
-  }
+//Shows the the header
 
   Widget headerWidget(String _city) {
     return FutureBuilder(
@@ -434,7 +124,7 @@ void dispose() {
             //    pinned: true,
             // title: Text("Sliver AppBar"),
             ///flexbible space bar
-            leading: showMain(widget.main, 10),
+            leading: AllIcons.showMain(widget.main, 10),
 
             title: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -540,7 +230,7 @@ void dispose() {
                                                   .width /
                                               3,
                                         ),
-                                        showMain(_currMain, 50)
+                                        AllIcons.showMain(widget.main, 50)
                                       ],
                                     ),
                                     Row(
@@ -570,8 +260,8 @@ void dispose() {
                         expanded: Stack(
                           alignment: Alignment.center,
                           children: <Widget>[
-                            Positioned(child: showDesc(_currDesc)),
-                            //TO DO - ADD PRESSURE, SEA LEVEL, ETC
+                            Positioned(
+                                child: AllIcons.showDesc(_currDesc, context)),
                             Positioned(
                               //top: 100,
                               child: Column(
