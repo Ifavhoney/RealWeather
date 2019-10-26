@@ -5,10 +5,6 @@ import 'package:weather/screens/weather.dart';
 import 'package:weather/screens/forecast.dart';
 import 'package:weather/screens/home.dart';
 
-import 'package:weather/data/data.dart' as data;
-
-//TO DO - TURN APP INTO A STATE MANAGEMENT APP
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {

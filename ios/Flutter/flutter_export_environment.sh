@@ -1,8 +1,8 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
 export "FLUTTER_ROOT=/Users/jason/Documents/Dev/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/jason/Downloads/weather"
-export "FLUTTER_TARGET=/Users/jason/Downloads/weather/lib/main.dart"
+export "FLUTTER_APPLICATION_PATH=/Users/jason/Downloads/Weather"
+export "FLUTTER_TARGET=/Users/jason/Downloads/Weather/lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "SYMROOT=${SOURCE_ROOT}/../build/ios"
 export "FLUTTER_FRAMEWORK_DIR=/Users/jason/Documents/Dev/flutter/bin/cache/artifacts/engine/ios"

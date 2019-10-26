@@ -106,7 +106,7 @@ class _WeatherState extends State<Weather> {
     //Have to return soemthing
     return FutureBuilder(
       //future builder requires a Future<Map>
-      future: data.WeatherAPIs.callTodayWeather(data.appKey, _city),
+      future: data.WeatherAPIs.callTodayAPI(data.appKey, _city),
       builder:
           (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         //check if there is data
